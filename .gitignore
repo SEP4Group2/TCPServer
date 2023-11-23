@@ -1,0 +1,17 @@
+# Ignore obj folder
+obj/
+
+# Ignore bin folder
+bin/
+
+# Ignore launchSettings.json
+launchSettings.json
+
+# JetBrains Rider-specific files
+dataSource.xml
+encodings.xml
+indexLayout.xml
+vcs.xml
+
+# User-specific files
+.idea/
