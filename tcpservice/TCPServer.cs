@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Domain.Model;
@@ -20,6 +20,7 @@ public class TCPServer
         plantHttpClient = new PlantHttpClient();
     }
     
+    
     private void ListenForClients()
     {
         this.tcpListener.Start();
@@ -31,7 +32,45 @@ public class TCPServer
             clientThread.Start(client);
         }
     }
-
+    
+    
+    // public async Task SendCodeToArduinoClient(int portNumber, int code)
+    // {
+    //     // You need to implement this method to send the code to a specific Arduino client
+    //     // Find the client with the specified MAC address and send the code
+    //     // Example: Sending the code to the client with the specified MAC address
+    //     var targetClient = FirstOrDefault(client => GetMacAddress(client) == macAddress);
+    //     
+    //     if (targetClient != null)
+    //     {
+    //         await SendCodeToClient(targetClient, code);
+    //     }
+    //     else
+    //     {
+    //         Console.WriteLine($"Client with MAC address {macAddress} not found.");
+    //     }
+    // }
+    //
+   
+    
+    // private async Task SendCodeToClient(TcpClient client, int code)
+    // {
+    //     try
+    //     {
+    //         NetworkStream clientStream = client.GetStream();
+    //
+    //         // Convert the code to bytes and send it to the client
+    //         byte[] codeBytes = Encoding.ASCII.GetBytes(code.ToString());
+    //         await clientStream.WriteAsync(codeBytes, 0, codeBytes.Length);
+    //         clientStream.Flush();
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Console.WriteLine($"Error sending code to client: {ex.Message}");
+    //     }
+    // }
+    //
+    
     private async void HandleClientComm(object client)
     {
         TcpClient tcpClient = (TcpClient)client;
@@ -53,7 +92,7 @@ public class TCPServer
             {
                 break;
             }
-
+            
             if (bytesRead == 0)
             {
                 break;
