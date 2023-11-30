@@ -11,13 +11,14 @@ public class TCPServer
     private TcpListener tcpListener;
     private Thread listenThread;
     private PlantHttpClient plantHttpClient;
-    
+    private TcpClient connectedClient;
     public TCPServer()
     {
         tcpListener = new TcpListener(IPAddress.Any, 23);
         listenThread = new Thread(new ThreadStart(ListenForClients));
         listenThread.Start();
         plantHttpClient = new PlantHttpClient();
+        connectedClient = new TcpClient();
     }
     
     
@@ -33,10 +34,15 @@ public class TCPServer
         }
     }
 
-
-
-    public void sendCodeForWaterPump()
+    public TcpClient GetConnectedClient()
     {
+        return connectedClient;
+    }
+
+    public async Task sendCodeForWaterPump(object client)
+    {
+        TcpClient tcpClient=(TcpClient)client;
+        NetworkStream clientStream = tcpClient.GetStream();
         try
         {
             // Send a response back to the client
@@ -50,12 +56,12 @@ public class TCPServer
         catch
         {
             Console.WriteLine("Error sending data to Arduino");
-            break;
         }
     }
+
     
     
-    // public async Task SendCodeToArduinoClient(int portNumber, int code)
+    // public async Task SendCodeToArduinoClient(int mac, int code)
     // {
     //     // You need to implement this method to send the code to a specific Arduino client
     //     // Find the client with the specified MAC address and send the code
@@ -72,25 +78,7 @@ public class TCPServer
     //     }
     // }
     //
-   
     
-    // private async Task SendCodeToClient(TcpClient client, int code)
-    // {
-    //     try
-    //     {
-    //         NetworkStream clientStream = client.GetStream();
-    //
-    //         // Convert the code to bytes and send it to the client
-    //         byte[] codeBytes = Encoding.ASCII.GetBytes(code.ToString());
-    //         await clientStream.WriteAsync(codeBytes, 0, codeBytes.Length);
-    //         clientStream.Flush();
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Console.WriteLine($"Error sending code to client: {ex.Message}");
-    //     }
-    // }
-    //
     
     private async void HandleClientComm(object client)
     {

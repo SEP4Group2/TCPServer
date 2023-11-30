@@ -1,16 +1,20 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build-env
+﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
+EXPOSE 80
+EXPOSE 443
 
-# Copy everything
-COPY . ./
-# Restore as distinct layers
-RUN dotnet restore
-# Build and publish a release
-RUN dotnet publish -c Release -o out
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /src
+COPY ["tcpservice/tcpservice.csproj", "tcpservice/"]
+RUN dotnet restore "tcpservice/tcpservice.csproj"
+COPY . .
+WORKDIR "/src/tcpservice"
+RUN dotnet build "tcpservice.csproj" -c Release -o /app/build
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine
-EXPOSE 23
+FROM build AS publish
+RUN dotnet publish "tcpservice.csproj" -c Release -o /app/publish
+
+FROM base AS final
 WORKDIR /app
-COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet", "TCPServer.dll"]
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "tcpservice.dll"]
