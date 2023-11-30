@@ -17,17 +17,35 @@ public class MessageConverter
             Regex tankLevelRegex = new Regex(@"""TankLevel"": (\d+)");
             Regex moistureRegex = new Regex(@"""Moisture"": (\d+)");
             Regex uvLightRegex = new Regex(@"""UVLight"": (\d+)");
+            Regex temperatureRegex = new Regex(@"""Temperature"":(\d+)");
+            Regex humidityRegex = new Regex(@"""Humidity"":(\d+)");
             
             string timestamp = null;
             float uvLight = 0;
             float moisture = 0;
-            float? temperature = null;
+            float temperature = 0;
             float humidity = 0;
             float tanklevel = 0;
 
             // Read the input string line by line
             foreach (string line in dataString.Split('\n'))
             {
+                // Extract temperature
+                Match temperatureMatch = temperatureRegex.Match(line);
+                if (temperatureMatch.Success)
+                {
+                    temperature = float.Parse(temperatureMatch.Groups[1].Value);
+                    Console.WriteLine($"Temperature:{temperature}");
+                }
+                
+                // Extract humidity
+                Match humidityMatch = humidityRegex.Match(line);
+                if (humidityMatch.Success)
+                {
+                    humidity = float.Parse(humidityMatch.Groups[1].Value);
+                    Console.WriteLine($"Humidity:{humidity}");
+                }
+                
                 // Extract timestamp
                 Match timestampMatch = timestampRegex.Match(line);
                 if (timestampMatch.Success)
