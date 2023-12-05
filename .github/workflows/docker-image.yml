@@ -16,6 +16,8 @@ jobs:
       uses: actions/checkout@v3
     - name: Login to Docker Hub
       run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+    - name: navigate to TCPServer folder 
+      run: cd TCPServer
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag tinajassik/tcp-server-1:latest
     - name: Push image to Docker Hub
