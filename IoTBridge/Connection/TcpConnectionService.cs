@@ -10,7 +10,15 @@ namespace IoTBridge.Connection
         
         public void AddConnection(ITcpConnection connection)
         {
+            Console.WriteLine("Cached the connection: " + connection.ConnectionId);
             connections.Add(connection.ConnectionId, connection);
+            
+            if (existingIds.Contains(connection.ConnectionId))
+            {
+                return;
+            }
+            existingIds.Add(connection.ConnectionId);
+            Console.WriteLine("Addded the connection to existingIds: " + connection.ConnectionId);
         }
 
         public void RemoveConnection(int connectionId)

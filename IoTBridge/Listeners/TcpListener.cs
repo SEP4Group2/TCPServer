@@ -43,7 +43,7 @@ public class TcpListener :  ITcpListener
             Console.WriteLine("New client connected to an TcpListner");
             
             Thread clientThread = new Thread(() => HandleClientsMessages(client));
-            clientThread.Start(client);
+            clientThread.Start();
         }
     }
 
@@ -65,7 +65,7 @@ public class TcpListener :  ITcpListener
             catch (Exception e)
             {
                 Console.WriteLine($"An error occured while reading from the stream: {e}");
-                break;
+                continue;
             }
 
             if (bytesRead == 0)
@@ -75,13 +75,14 @@ public class TcpListener :  ITcpListener
             }
 
             string convertedData = ConvertDataToString(recievedPacket, bytesRead);
-            CreateIotRecievedDataResult receivedDataResult = JsonCasterHelper.DeserializeData<CreateIotRecievedDataResult, TcpReceivedData>(convertedData);
             
+            CreateIotRecievedDataResult receivedDataResult = JsonCasterHelper.DeserializeData<CreateIotRecievedDataResult, TcpReceivedData>(convertedData);
             if (receivedDataResult.HasError)
             {
-                Console.WriteLine(receivedDataResult.Error);
+                Console.WriteLine($"Error occured when deserializing the iot data: {receivedDataResult.Error}");
                 continue;
             }
+            
             OnMessageRecieved.Invoke(client, receivedDataResult.Data);
         }
         

@@ -64,7 +64,14 @@ namespace IoTBridge.Communicators.PlantApi
             {
                 string existingDeviceIdsContent = await GetAsync("/api/v1/devices");
                 ExistingDeviceIdsResult deserializedDeviceIds = JsonCasterHelper.DeserializeData<ExistingDeviceIdsResult ,ExistingDeviceIds>(existingDeviceIdsContent);
-            
+
+                if (deserializedDeviceIds.HasError)
+                {
+                    return new ExistingDeviceIdsResult()
+                    {
+                        Error = deserializedDeviceIds.Error
+                    };
+                }
                 return deserializedDeviceIds;
             }
             catch(Exception e)

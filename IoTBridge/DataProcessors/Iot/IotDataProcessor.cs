@@ -40,7 +40,7 @@ namespace IoTBridge.DataProcessors.Iot
                     Console.WriteLine(registrationDataResult.Error);
                     return;
                 }
-                iotDataProcesorService.RegisterDevice(tcpClient, registrationDataResult.Data, 0);
+                iotDataProcesorService.RegisterDevice(tcpClient, registrationDataResult.Data, -1);
             }
         }
 
@@ -48,7 +48,7 @@ namespace IoTBridge.DataProcessors.Iot
         {
             bool doesDataHandlingRequireTcpClient = dataDataType switch
             {
-                TcpDataTypes.PlantData => true,
+                TcpDataTypes.Registration => true,
                 _ => false
             };
             return doesDataHandlingRequireTcpClient;
