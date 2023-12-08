@@ -112,15 +112,26 @@ namespace IoTBridge.DataProcessors.Iot.Service
             tcpConnectionService.AddConnection(newConnection); 
             Console.WriteLine("Sending the registration id to the client...");
             iotCommunicator.SendRegistrationId(deviceId);
+
+            var idMessageToDisplay = "";
+            if (deviceId < 10)
+            {
+                idMessageToDisplay = "0" + deviceId;
+            }
+            else
+            {
+                idMessageToDisplay = deviceId.ToString();
+            }
+            iotCommunicator.SendMessage(deviceId, idMessageToDisplay);
+            iotCommunicator.SendAction(deviceId, IotActions.DATA);
         }
 
-        private async Task ForwardPlantDataToApi(int connectionId, List<PlantData> plantData)
+        private async Task ForwardPlantDataToApi(int connectionId, List<PlantDataApi> plantData)
         {
             Console.WriteLine($"Trying to forward cached plant data to api for connection: {connectionId}");
-            List<PlantDataApi> plantDataApiList = PlantApiCommunicatorHelper.ConvertPlantDataToPlantDataApi(plantData);
             var plantDataRequest = new PlantDataRequest()
             {
-                PlantDataApi = plantDataApiList
+                PlantDataApi = plantData
             };
             
             EmptyCommunicatorResult sendPlantDataResult = await plantApiCommunicator.SendPlantData(plantDataRequest);

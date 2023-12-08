@@ -6,4 +6,5 @@ public interface IIotCommunicator
 {
     void SendRegistrationId(int deviceId);
     void SendAction(int deviceId, IotActions action);
+    void SendMessage(int deviceId, string message);
 }

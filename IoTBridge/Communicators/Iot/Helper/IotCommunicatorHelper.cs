@@ -14,7 +14,7 @@ public static class IotCommunicatorHelper
         }
         return "999999" + id;
     }
-
+    
     public static string ConvertActionToMessage(IotActions action)
     {
         switch (action)
@@ -38,7 +38,6 @@ public static class IotCommunicatorHelper
         }
 
         StringBuilder result = new StringBuilder();
-
         foreach (char c in text)
         {
             try
@@ -79,6 +78,7 @@ public static class IotCommunicatorHelper
             case 'G': return 06;
             case 'O': return 00;
             case '-': return 16;
+            case 'I': return 01;
             case ' ': return 17;
             default: throw new ArgumentException($"Invalid character: {c}");
         }

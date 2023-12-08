@@ -22,4 +22,10 @@ public class IotCommunicator : ATcpCommunicator,  IIotCommunicator
         string convertedAction = IotCommunicatorHelper.ConvertActionToMessage(action);
         Send(deviceId, convertedAction);
     }
+
+    public void SendMessage(int deviceId, string message)
+    {
+        string convertedMessage = IotCommunicatorHelper.ConvertStringToMessage(message.ToUpper());
+        Send(deviceId, convertedMessage);
+    }
 }
