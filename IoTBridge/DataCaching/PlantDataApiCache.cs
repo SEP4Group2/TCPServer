@@ -1,22 +1,22 @@
-using IoTBridge.IncomingData.Iot;
+using IoTBridge.Communicators.PlantApi.DTOs.Requests;
 
 namespace IoTBridge.DataCaching;
 
-public class PlantDataCache : IPlantDataCache
+public class PlantDataApiCache : IPlantDataApiCache
 {
     private readonly int memoryProtectionMaxCache;
-    private Dictionary<int, List<PlantData>> plantDataByConnectionId = new();
+    private Dictionary<int, List<PlantDataApi>> plantDataByConnectionId = new();
 
-    public PlantDataCache(int memoryProtectionMaxCache)
+    public PlantDataApiCache(int memoryProtectionMaxCache)
     {
         this.memoryProtectionMaxCache = memoryProtectionMaxCache;
     }
 
-    public void CachePlantData(int connectionId, PlantData dataRequest)
+    public void CachePlantData(int connectionId, PlantDataApi dataRequest)
     {
         if (!plantDataByConnectionId.ContainsKey(connectionId))
         {
-            plantDataByConnectionId.Add(connectionId, new List<PlantData>(){dataRequest});
+            plantDataByConnectionId.Add(connectionId, new List<PlantDataApi>(){dataRequest});
         }
         else
         {
@@ -35,7 +35,7 @@ public class PlantDataCache : IPlantDataCache
         return plantDataByConnectionId.ContainsKey(connectionId) && plantDataByConnectionId[connectionId].Count >= maxCachedData;
     }
     
-    public List<PlantData> GetCachedDataByConnectionId(int connectionId)
+    public List<PlantDataApi> GetCachedDataByConnectionId(int connectionId)
     {
         return plantDataByConnectionId[connectionId];
     }

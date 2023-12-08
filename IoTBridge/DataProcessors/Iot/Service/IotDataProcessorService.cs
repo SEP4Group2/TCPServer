@@ -1,6 +1,7 @@
 using System.Net.Sockets;
 using IoTBridge.Communicators.Base;
 using IoTBridge.Communicators.Iot;
+using IoTBridge.Communicators.Iot.Data;
 using IoTBridge.Communicators.PlantApi;
 using IoTBridge.Communicators.PlantApi.DTOs.Requests;
 using IoTBridge.Communicators.PlantApi.Helper;
@@ -14,29 +15,30 @@ namespace IoTBridge.DataProcessors.Iot.Service
 {
     public class IotDataProcessorService : IIotDataProcessorService
     {
-        private const int MAX_CACHED_DATA = 10;
+        private const int MAX_CACHED_DATA = 1;
         private readonly IIotCommunicator iotCommunicator;
         private readonly ITcpConnectionService tcpConnectionService;
         private readonly IPlantApiCommunicator plantApiCommunicator;
-        private readonly IPlantDataCache plantDataCache;
+        private readonly IPlantDataApiCache plantDataApiCache;
     
-        public IotDataProcessorService(ITcpConnectionService tcpConnectionService, IIotCommunicator iotCommunicator, IPlantApiCommunicator plantApiCommunicator, IPlantDataCache plantDataCache)
+        public IotDataProcessorService(ITcpConnectionService tcpConnectionService, IIotCommunicator iotCommunicator, IPlantApiCommunicator plantApiCommunicator, IPlantDataApiCache plantDataApiCache)
         {
             this.tcpConnectionService = tcpConnectionService;
             this.iotCommunicator = iotCommunicator;
             this.plantApiCommunicator = plantApiCommunicator;
-            this.plantDataCache = plantDataCache;
+            this.plantDataApiCache = plantDataApiCache;
         }
 
         public void ForwardPlantDataToCache(int connectionId, PlantData plantData)
         {
-            plantDataCache.CachePlantData(connectionId, plantData);
-            if (!plantDataCache.HasConnectionReachedMaxCache(connectionId, MAX_CACHED_DATA))
+            var convertedPlantData = PlantApiCommunicatorHelper.ConvertPlantDataToDataApi(plantData);
+            plantDataApiCache.CachePlantData(connectionId, convertedPlantData);
+            if (!plantDataApiCache.HasConnectionReachedMaxCache(connectionId, MAX_CACHED_DATA))
             {
                 return;
             }
 
-            List<PlantData> cachedPlantData = plantDataCache.GetCachedDataByConnectionId(connectionId);
+            List<PlantDataApi> cachedPlantData = plantDataApiCache.GetCachedDataByConnectionId(connectionId);
             ForwardPlantDataToApi(connectionId, cachedPlantData).ConfigureAwait(false);
         }
 
@@ -129,7 +131,7 @@ namespace IoTBridge.DataProcessors.Iot.Service
             } 
             
             Console.WriteLine("Successfully forwarded cached plant data to api");
-            plantDataCache.ClearCacheByConnectionId(connectionId);
+            plantDataApiCache.ClearCacheByConnectionId(connectionId);
         }
     }
 }

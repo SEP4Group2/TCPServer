@@ -5,9 +5,9 @@ namespace IoTBridge.Communicators.PlantApi.Helper;
 
 public class PlantApiCommunicatorHelper
 {
-    public static List<PlantDataApi> ConvertPlantDataToPlantDataApi(List<PlantData> plantData)
+    public static PlantDataApi ConvertPlantDataToDataApi(PlantData plantData)
     {
-        return plantData.Select(plantData => new PlantDataApi
+        return new PlantDataApi()
         {
             TimeStamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             DeviceId = plantData.DeviceId,
@@ -16,6 +16,6 @@ public class PlantApiCommunicatorHelper
             UVLight = plantData.UVLight,
             Moisture = plantData.Moisture,
             TankLevel = plantData.TankLevel
-        }).ToList();
+        };
     }
 }
