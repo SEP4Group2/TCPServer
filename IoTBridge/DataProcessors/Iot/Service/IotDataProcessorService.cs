@@ -54,14 +54,17 @@ namespace IoTBridge.DataProcessors.Iot.Service
                 DeviceId = connectionId,
                 Status = status
             };
+            
             EmptyCommunicatorResult updateDeviceStatusResult = await plantApiCommunicator.UpdateDeviceStatus(deviceStatus);
             if (updateDeviceStatusResult.HasError)
             {
                 Console.WriteLine(updateDeviceStatusResult.Error);
                 return;
             }
-            tcpConnectionService.RemoveConnection(connectionId);
             Console.WriteLine($"Successfully updated status for device with id: {connectionId}");
+            
+            tcpConnectionService.RemoveConnection(connectionId);
+            Console.WriteLine("Successfully removed connection with id: " + connectionId);
         }
 
         public void RegisterDevice(TcpClient client, RegistrationData registrationData, int invalidId)
@@ -73,9 +76,10 @@ namespace IoTBridge.DataProcessors.Iot.Service
         {
             Console.WriteLine($"Trying to registrate device with remote endpoint: {client.Client.RemoteEndPoint}");
             var existingConnectionIds = tcpConnectionService.GetExistingIds();
-            int deviceId = registrationData.Id;
+            int deviceId = registrationData.DeviceId;
+            Console.WriteLine($"The recieved device id: {deviceId}");
             
-            if(deviceId == invalidId || !existingConnectionIds.Contains(deviceId))
+            if(deviceId == invalidId && !existingConnectionIds.Contains(deviceId))
             {
                 Console.WriteLine("Generating a new id for the device...");
                 deviceId = NewIdGenerator.GenerateNewId(existingConnectionIds);
@@ -88,7 +92,7 @@ namespace IoTBridge.DataProcessors.Iot.Service
                 }
                 Console.WriteLine($"Successfully created new id: {deviceId} for device with remote endpoint: {client.Client.RemoteEndPoint}");
             }
-            else
+            else if(deviceId > 0 && !existingConnectionIds.Contains(deviceId))
             {
                 var status = new UpdateDeviceStatus()
                 {
@@ -112,17 +116,8 @@ namespace IoTBridge.DataProcessors.Iot.Service
             tcpConnectionService.AddConnection(newConnection); 
             Console.WriteLine("Sending the registration id to the client...");
             iotCommunicator.SendRegistrationId(deviceId);
-
-            var idMessageToDisplay = "";
-            if (deviceId < 10)
-            {
-                idMessageToDisplay = "0" + deviceId;
-            }
-            else
-            {
-                idMessageToDisplay = deviceId.ToString();
-            }
-            iotCommunicator.SendMessage(deviceId, idMessageToDisplay);
+            
+            iotCommunicator.SendMessage(deviceId, ConvertDeviceIdToLedMessage(deviceId));
             iotCommunicator.SendAction(deviceId, IotActions.DATA);
         }
 
@@ -143,6 +138,20 @@ namespace IoTBridge.DataProcessors.Iot.Service
             
             Console.WriteLine("Successfully forwarded cached plant data to api");
             plantDataApiCache.ClearCacheByConnectionId(connectionId);
+        }
+
+        private string ConvertDeviceIdToLedMessage(int deviceId)
+        {
+            var idMessageToDisplay = "";
+            if (deviceId < 10)
+            {
+                idMessageToDisplay = "0" + deviceId;
+            }
+            else
+            {
+                idMessageToDisplay = deviceId.ToString();
+            }
+            return idMessageToDisplay;
         }
     }
 }
