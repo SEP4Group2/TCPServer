@@ -18,6 +18,7 @@ public class PlantDataApi
 
     public float TankLevel { get; set; } 
 }
+
 public class PlantDataRequest
 {
     public List<PlantDataApi> PlantDataApi { get; set; }

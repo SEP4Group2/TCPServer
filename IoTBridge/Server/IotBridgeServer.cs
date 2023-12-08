@@ -42,7 +42,7 @@ namespace IoTBridge.Server
 
             iotListener.OnMessageRecieved += HandleIotData;
             iotListener.OnClientDisconnected += HandleCloseTcpConnection;
-            plantApiListener.OnMessageRecieved += HandlePlantApiData;
+            plantApiListener.OnMessageReceived += HandlePlantApiData;
         
             iotListenerThread = new Thread(iotListener.Run);
             plantApiListenerThread = new Thread(plantApiListener.Run);

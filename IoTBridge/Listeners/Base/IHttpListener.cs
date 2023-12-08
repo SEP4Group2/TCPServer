@@ -5,5 +5,5 @@ namespace IoTBridge.Listeners.Base;
 
 public interface IHttpListener : IListener
 {
-    Action<IHttpReceivedData> OnMessageRecieved { get; set; }
+    Action<IHttpReceivedData> OnMessageReceived { get; set; }
 }

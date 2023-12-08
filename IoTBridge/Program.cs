@@ -19,12 +19,16 @@ namespace IoTBridge
         private static IIotCommunicator iotCommunicator;
         private static IIotDataProcessorService iotDataProcessorService;
         private static IPlantApiDataProcessorService plantApiDataProcessorService;
-        private static IPlantDataCache plantDataCache;
+        private static IPlantDataApiCache plantDataApiCache;
         
         public static async Task Main()
         {
             Initialize();
-            //await CacheExistingDeviceIds();
+            bool hasCachedIds = await CacheExistingDeviceIds();
+            if (!hasCachedIds)
+            {
+                return;
+            }
             
             RunServer();
         }
@@ -32,12 +36,12 @@ namespace IoTBridge
         private static void Initialize()
         {
              tcpConnectionService = new TcpConnectionService();
-             plantDataCache = new PlantDataCache(100);
+             plantDataApiCache = new PlantDataApiCache(100);
              
              plantApiCommunicator = new PlantApiCommunicator("http://localhost:5000/api/");
              iotCommunicator = new IotCommunicator(tcpConnectionService);
              
-             iotDataProcessorService = new IotDataProcessorService(tcpConnectionService, iotCommunicator, plantApiCommunicator, plantDataCache);
+             iotDataProcessorService = new IotDataProcessorService(tcpConnectionService, iotCommunicator, plantApiCommunicator, plantDataApiCache);
              plantApiDataProcessorService = new PlantApiDataProcessorService(iotCommunicator);
              
              Console.WriteLine("Services have been initialized");
@@ -52,17 +56,18 @@ namespace IoTBridge
             Console.WriteLine("IoTBridge server has been started");
         }
         
-        private static async Task CacheExistingDeviceIds()
+        private static async Task<bool> CacheExistingDeviceIds()
         {
             Console.WriteLine("Retrieving existing device ids...");
             ExistingDeviceIdsResult result = await plantApiCommunicator.GetExistingDeviceIds();
             if (result.HasError)
             {
                 Console.WriteLine($"Error occured when trying to get existing device ids: {result.Error}");
-                return;
+                return false;
             }
             tcpConnectionService.SetExistingIds(result.Data.DeviceIds);
             Console.WriteLine("Existing device ids have been retrieved and cashed");
+            return true;
         }
     }
 }

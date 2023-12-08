@@ -9,7 +9,7 @@ namespace IoTBridge.Listeners;
 
 public class HttpListener : IHttpListener
 {
-    public Action<IHttpReceivedData> OnMessageRecieved { get; set; }
+    public Action<IHttpReceivedData> OnMessageReceived { get; set; }
     
     private readonly string listenerUrl;
     private readonly string endpoint;
@@ -68,8 +68,9 @@ public class HttpListener : IHttpListener
             return;
         }
         
-        OnMessageRecieved.Invoke(createPlantApiRecievedDataAResult.Data);
+        OnMessageReceived.Invoke(createPlantApiRecievedDataAResult.Data);
         reader.Close();
+        // Maybe move this inside of the OnMessageRecieved invokation
         CloseConnection(response, 200);
     }
 
