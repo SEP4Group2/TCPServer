@@ -8,4 +8,5 @@ public interface ITcpConnectionService : IConnectionService<ITcpConnection, TcpC
     List<int> GetExistingIds();
     void SetExistingIds(List<int> existingIds);
     int GetConnectionIdByTcpClient(TcpClient client);
+    bool ConnectionExists(int deviceId);
 }
