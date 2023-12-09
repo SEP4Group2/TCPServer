@@ -12,6 +12,7 @@ public abstract class ATcpCommunicator
     }
     protected void Send(int deviceId, string message)
     {
+        message += "\n";
         byte[] data = ConvertStringToByteArray(message);
         try
         {

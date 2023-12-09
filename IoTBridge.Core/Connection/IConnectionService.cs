@@ -8,7 +8,7 @@ namespace IoTBridge.Core.Connection
         where TClient : IDisposable, new()
     {
         void AddConnection(TConnection connection);
-        void RemoveConnection(int connectionId);
+        void CloseAndRemoveConnection(int connectionId);
         void SendData(int connectionId, byte[] data);
     }
 }

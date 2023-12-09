@@ -11,6 +11,11 @@ namespace IoTBridge.Connection
         public void AddConnection(ITcpConnection connection)
         {
             Console.WriteLine("Cached the connection: " + connection.ConnectionId);
+            if (connections.ContainsKey(connection.ConnectionId))
+            {
+                connections[connection.ConnectionId] = connection;
+                return;
+            }
             connections.Add(connection.ConnectionId, connection);
             
             if (existingIds.Contains(connection.ConnectionId))
@@ -21,8 +26,9 @@ namespace IoTBridge.Connection
             Console.WriteLine("Addded the connection to existingIds: " + connection.ConnectionId);
         }
 
-        public void RemoveConnection(int connectionId)
+        public void CloseAndRemoveConnection(int connectionId)
         {
+            connections[connectionId].Client.Close();
             connections.Remove(connectionId);
         }
 
@@ -36,7 +42,9 @@ namespace IoTBridge.Connection
             ITcpConnection connection = GetConnection(connectionId);
             
             NetworkStream stream = connection.Client.GetStream();
+            Console.WriteLine("Sending the data........");
             stream.Write(data, 0, data.Length);
+            stream.Flush();
         }
 
         public List<int> GetExistingIds()
@@ -62,6 +70,11 @@ namespace IoTBridge.Connection
                 return -1;
             }
             return connection.ConnectionId;
+        }
+
+        public bool ConnectionExists(int deviceId)
+        {
+            return connections.ContainsKey(deviceId);
         }
     }
 }
