@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net.Sockets;
 using IoTBridge.Communicators.Base;
 using IoTBridge.Communicators.Iot;
@@ -39,7 +40,10 @@ namespace IoTBridge.DataProcessors.Iot.Service
             }
 
             List<PlantDataApi> cachedPlantData = plantDataApiCache.GetCachedDataByConnectionId(connectionId);
-            ForwardPlantDataToApi(connectionId, cachedPlantData).ConfigureAwait(false);
+            Task.Run(async () =>
+            {
+                await ForwardPlantDataToApi(connectionId, cachedPlantData);
+            });
         }
 
         public void UpdateDeviceStatus(int connectionId, bool status)
@@ -63,13 +67,18 @@ namespace IoTBridge.DataProcessors.Iot.Service
             }
             Console.WriteLine($"Successfully updated status for device with id: {connectionId}");
             
-            tcpConnectionService.RemoveConnection(connectionId);
+            tcpConnectionService.CloseAndRemoveConnection(connectionId);
             Console.WriteLine("Successfully removed connection with id: " + connectionId);
         }
 
         public void RegisterDevice(TcpClient client, RegistrationData registrationData, int invalidId)
         {
-            RegisterDeviceAsync(client, registrationData, invalidId).ConfigureAwait(false);
+            
+
+            Task.Run(async () =>
+            {
+                await RegisterDeviceAsync(client, registrationData, invalidId);
+            });
         }
     
         private async Task RegisterDeviceAsync(TcpClient client, RegistrationData registrationData, int invalidId)
@@ -79,7 +88,7 @@ namespace IoTBridge.DataProcessors.Iot.Service
             int deviceId = registrationData.DeviceId;
             Console.WriteLine($"The recieved device id: {deviceId}");
             
-            if(deviceId == invalidId && !existingConnectionIds.Contains(deviceId))
+            if(deviceId == invalidId || !existingConnectionIds.Contains(deviceId))
             {
                 Console.WriteLine("Generating a new id for the device...");
                 deviceId = NewIdGenerator.GenerateNewId(existingConnectionIds);
@@ -116,9 +125,27 @@ namespace IoTBridge.DataProcessors.Iot.Service
             tcpConnectionService.AddConnection(newConnection); 
             Console.WriteLine("Sending the registration id to the client...");
             iotCommunicator.SendRegistrationId(deviceId);
+            Console.WriteLine("Sending the registration id to the client...Done");
+
+            var idMessageToDisplay = "";
+            if (deviceId < 10)
+            {
+                idMessageToDisplay = "0" + deviceId;
+            }
+            else
+            {
+                idMessageToDisplay = deviceId.ToString();
+            }
+
+            await Task.Delay(3000);
+            Console.WriteLine("Sending a message to display id");
+            iotCommunicator.SendMessage(deviceId, $"ID{idMessageToDisplay}");
+            Console.WriteLine("Sending a message to display id...Done");
             
-            iotCommunicator.SendMessage(deviceId, ConvertDeviceIdToLedMessage(deviceId));
+            await Task.Delay(3000);
+            Console.WriteLine("Sending a message to start sending data");
             iotCommunicator.SendAction(deviceId, IotActions.DATA);
+            Console.WriteLine("Sending a message to start sending data...Done");
         }
 
         private async Task ForwardPlantDataToApi(int connectionId, List<PlantDataApi> plantData)
@@ -138,20 +165,6 @@ namespace IoTBridge.DataProcessors.Iot.Service
             
             Console.WriteLine("Successfully forwarded cached plant data to api");
             plantDataApiCache.ClearCacheByConnectionId(connectionId);
-        }
-
-        private string ConvertDeviceIdToLedMessage(int deviceId)
-        {
-            var idMessageToDisplay = "";
-            if (deviceId < 10)
-            {
-                idMessageToDisplay = "0" + deviceId;
-            }
-            else
-            {
-                idMessageToDisplay = deviceId.ToString();
-            }
-            return idMessageToDisplay;
         }
     }
 }
