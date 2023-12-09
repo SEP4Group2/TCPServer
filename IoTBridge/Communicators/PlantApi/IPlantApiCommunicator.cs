@@ -9,5 +9,5 @@ public interface IPlantApiCommunicator
     Task<EmptyCommunicatorResult> RegisterDevice(int deviceId);
     Task<EmptyCommunicatorResult> UpdateDeviceStatus(UpdateDeviceStatus updateDeviceStatus);
     Task<ExistingDeviceIdsResult> GetExistingDeviceIds();
-    Task<EmptyCommunicatorResult> SendPlantData(PlantDataRequest plantDataRequest);
+    Task<EmptyCommunicatorResult> SendPlantData(PlantDataCreationListDTO plantDataCreationListDto);
 }

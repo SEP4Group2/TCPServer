@@ -17,11 +17,7 @@ namespace IoTBridge.Communicators.PlantApi
         {
             try
             {
-                var parameters = new Dictionary<string, string>()
-                {
-                    { "deviceId", deviceId.ToString() }
-                };
-                await PostAsync(parameters, "device/registerDevice");
+                await PostAsync($"device/registerDevice/{deviceId}");
                 return new EmptyCommunicatorResult();
             }
             catch (Exception e)
@@ -84,9 +80,9 @@ namespace IoTBridge.Communicators.PlantApi
             }
         }
 
-        public async Task<EmptyCommunicatorResult> SendPlantData(PlantDataRequest plantDataRequest)
+        public async Task<EmptyCommunicatorResult> SendPlantData(PlantDataCreationListDTO plantDataCreationListDto)
         {
-            SerializationResult body = JsonCasterHelper.SerializeData(plantDataRequest);
+            SerializationResult body = JsonCasterHelper.SerializeData(plantDataCreationListDto);
             if (body.HasError)
             {
                 return new EmptyCommunicatorResult()

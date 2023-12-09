@@ -4,9 +4,9 @@ namespace IoTBridge.DataCaching
 {
     public interface IPlantDataApiCache
     {
-        void CachePlantData(int connectionId, PlantDataApi dataRequest);
+        void CachePlantData(int connectionId, PlantDataCreationDTO dataRequest);
         bool HasConnectionReachedMaxCache(int connectionId, int maxCachedData);
         bool ClearCacheByConnectionId(int connectionId);
-        List<PlantDataApi> GetCachedDataByConnectionId(int connectionId);
+        List<PlantDataCreationDTO> GetCachedDataByConnectionId(int connectionId);
     }
 }

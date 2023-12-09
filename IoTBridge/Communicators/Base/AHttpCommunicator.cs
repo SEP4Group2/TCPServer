@@ -16,8 +16,9 @@ namespace IoTBridge.Communicators.Base
         protected async Task PostAsync(string body, string endpoint)
         {
             string url = baseUrl + endpoint;
-            var content = new StringContent(body, Encoding.UTF8, "application/json");
+            var content = new StringContent(body, Encoding.ASCII, "application/json");
 
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
             var response = await httpClient.PostAsync(url, content);
             
             if (!response.IsSuccessStatusCode)
@@ -26,12 +27,11 @@ namespace IoTBridge.Communicators.Base
             }
         }
         
-        protected async Task PostAsync(Dictionary<string, string> parameters, string endpoint)
+        protected async Task PostAsync(string endpoint)
         {
             string url = baseUrl + endpoint;
-            var encodedContent = new FormUrlEncodedContent(parameters);
 
-            var response = await httpClient.PostAsync(url, encodedContent);
+            var response = await httpClient.PostAsync(url, null);
             
             if (!response.IsSuccessStatusCode)
             {

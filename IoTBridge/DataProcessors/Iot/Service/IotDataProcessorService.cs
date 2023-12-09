@@ -38,7 +38,7 @@ namespace IoTBridge.DataProcessors.Iot.Service
                 return;
             }
 
-            List<PlantDataApi> cachedPlantData = plantDataApiCache.GetCachedDataByConnectionId(connectionId);
+            List<PlantDataCreationDTO> cachedPlantData = plantDataApiCache.GetCachedDataByConnectionId(connectionId);
             Task.Run(async () =>
             {
                 await ForwardPlantDataToApi(connectionId, cachedPlantData);
@@ -91,13 +91,14 @@ namespace IoTBridge.DataProcessors.Iot.Service
             {
                 Console.WriteLine("Generating a new id for the device...");
                 deviceId = NewIdGenerator.GenerateNewId(existingConnectionIds);
-                
+                Console.WriteLine("trying to forward the registration to plantApi...");
                 EmptyCommunicatorResult plantApiDeviceRegistrationResult = await plantApiCommunicator.RegisterDevice(deviceId);
                 if (plantApiDeviceRegistrationResult.HasError)
                 {
-                    Console.WriteLine(plantApiDeviceRegistrationResult.Error);
+                    Console.WriteLine($"Error happend in the plantapi: {plantApiDeviceRegistrationResult.Error}");
                     return;
                 }
+                Console.WriteLine("The registration happend to plantApi...");
                 Console.WriteLine($"Successfully created new id: {deviceId} for device with remote endpoint: {client.Client.RemoteEndPoint}");
             }
             else if(deviceId > 0 && !existingConnectionIds.Contains(deviceId))
@@ -147,10 +148,10 @@ namespace IoTBridge.DataProcessors.Iot.Service
             Console.WriteLine("Sending a message to start sending data...Done");
         }
 
-        private async Task ForwardPlantDataToApi(int connectionId, List<PlantDataApi> plantData)
+        private async Task ForwardPlantDataToApi(int connectionId, List<PlantDataCreationDTO> plantData)
         {
             Console.WriteLine($"Trying to forward cached plant data to api for connection: {connectionId}");
-            var plantDataRequest = new PlantDataRequest()
+            var plantDataRequest = new PlantDataCreationListDTO()
             {
                 PlantDataApi = plantData
             };
