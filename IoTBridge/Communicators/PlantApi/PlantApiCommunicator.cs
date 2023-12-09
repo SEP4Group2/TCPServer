@@ -21,7 +21,7 @@ namespace IoTBridge.Communicators.PlantApi
                 {
                     { "deviceId", deviceId.ToString() }
                 };
-                await PostAsync(parameters, "/api/v1/devices");
+                await PostAsync(parameters, "device/registerDevice");
                 return new EmptyCommunicatorResult();
             }
             catch (Exception e)
@@ -46,7 +46,7 @@ namespace IoTBridge.Communicators.PlantApi
 
             try
             {
-                await UpdateAsync(body.SerializedObject, "/api/v1/devices");
+                await UpdateAsync(body.SerializedObject, "device/changeStatusCode");
                 return new EmptyCommunicatorResult();
             }
             catch (Exception e)
@@ -62,7 +62,8 @@ namespace IoTBridge.Communicators.PlantApi
         {
             try
             {
-                string existingDeviceIdsContent = await GetAsync("/api/v1/devices");
+                string existingDeviceIdsContent = await GetAsync("device/getAllIds");
+                Console.WriteLine($"HttpCommunicator recieved this data: {existingDeviceIdsContent}");
                 ExistingDeviceIdsResult deserializedDeviceIds = JsonCasterHelper.DeserializeData<ExistingDeviceIdsResult ,ExistingDeviceIds>(existingDeviceIdsContent);
 
                 if (deserializedDeviceIds.HasError)
@@ -96,7 +97,7 @@ namespace IoTBridge.Communicators.PlantApi
             
             try
             {
-                await PostAsync(body.SerializedObject, "/api/v1/devices");
+                await PostAsync(body.SerializedObject, "plantData/savePlantData");
                 return new EmptyCommunicatorResult();
             }
             catch (Exception e)

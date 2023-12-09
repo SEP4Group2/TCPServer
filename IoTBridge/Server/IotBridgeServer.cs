@@ -31,7 +31,7 @@ namespace IoTBridge.Server
             this.iotDataProcessorService = iotDataProcessorService;
         
             iotListener = new TcpListener(IPAddress.Any, 3014, 4096);
-            plantApiListener = new HttpListener("http://+:5024/", "api/plants");
+            plantApiListener = new HttpListener("http://+:5024/", "/api/plants");
             plantApiDataProcessor = new PlantApiDataProcessor(plantApiDataProcessorService);
             iotDataProcessor = new IotDataProcessor(iotDataProcessorService);
         }
