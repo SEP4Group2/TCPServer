@@ -39,7 +39,7 @@ public class HttpListener : IHttpListener
             Console.WriteLine("New client connected to an HttpListner");
             
             Thread clientThread = new Thread(() => HandleClientsMessages(context));
-            clientThread.Start(context);
+            clientThread.Start();
         }
     }
 

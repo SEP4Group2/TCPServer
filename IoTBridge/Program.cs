@@ -38,7 +38,7 @@ namespace IoTBridge
              tcpConnectionService = new TcpConnectionService();
              plantDataApiCache = new PlantDataApiCache(100);
              
-             plantApiCommunicator = new PlantApiCommunicator("http://localhost:5000/api/");
+             plantApiCommunicator = new PlantApiCommunicator("http://plantapi:5000/");
              iotCommunicator = new IotCommunicator(tcpConnectionService);
              
              iotDataProcessorService = new IotDataProcessorService(tcpConnectionService, iotCommunicator, plantApiCommunicator, plantDataApiCache);
@@ -58,12 +58,15 @@ namespace IoTBridge
         
         private static async Task<bool> CacheExistingDeviceIds()
         {
+            await Task.Delay(3000);
             Console.WriteLine("Retrieving existing device ids...");
+            
             ExistingDeviceIdsResult result = await plantApiCommunicator.GetExistingDeviceIds();
             if (result.HasError)
             {
                 Console.WriteLine($"Error occured when trying to get existing device ids: {result.Error}");
-                return false;
+                Console.WriteLine($"Trying to reconnect....");
+                return await CacheExistingDeviceIds();
             }
             tcpConnectionService.SetExistingIds(result.Data.DeviceIds);
             Console.WriteLine("Existing device ids have been retrieved and cashed");
