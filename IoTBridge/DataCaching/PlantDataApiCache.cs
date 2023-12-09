@@ -5,18 +5,18 @@ namespace IoTBridge.DataCaching;
 public class PlantDataApiCache : IPlantDataApiCache
 {
     private readonly int memoryProtectionMaxCache;
-    private Dictionary<int, List<PlantDataApi>> plantDataByConnectionId = new();
+    private Dictionary<int, List<PlantDataCreationDTO>> plantDataByConnectionId = new();
 
     public PlantDataApiCache(int memoryProtectionMaxCache)
     {
         this.memoryProtectionMaxCache = memoryProtectionMaxCache;
     }
 
-    public void CachePlantData(int connectionId, PlantDataApi dataRequest)
+    public void CachePlantData(int connectionId, PlantDataCreationDTO dataRequest)
     {
         if (!plantDataByConnectionId.ContainsKey(connectionId))
         {
-            plantDataByConnectionId.Add(connectionId, new List<PlantDataApi>(){dataRequest});
+            plantDataByConnectionId.Add(connectionId, new List<PlantDataCreationDTO>(){dataRequest});
         }
         else
         {
@@ -35,7 +35,7 @@ public class PlantDataApiCache : IPlantDataApiCache
         return plantDataByConnectionId.ContainsKey(connectionId) && plantDataByConnectionId[connectionId].Count >= maxCachedData;
     }
     
-    public List<PlantDataApi> GetCachedDataByConnectionId(int connectionId)
+    public List<PlantDataCreationDTO> GetCachedDataByConnectionId(int connectionId)
     {
         return plantDataByConnectionId[connectionId];
     }

@@ -5,9 +5,9 @@ namespace IoTBridge.Communicators.PlantApi.Helper;
 
 public class PlantApiCommunicatorHelper
 {
-    public static PlantDataApi ConvertPlantDataToDataApi(PlantData plantData)
+    public static PlantDataCreationDTO ConvertPlantDataToDataApi(PlantData plantData)
     {
-        return new PlantDataApi()
+        return new PlantDataCreationDTO()
         {
             TimeStamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             DeviceId = plantData.DeviceId,
