@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Net.Sockets;
 using IoTBridge.Communicators.Base;
 using IoTBridge.Communicators.Iot;
