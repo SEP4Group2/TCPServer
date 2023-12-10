@@ -2,38 +2,41 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f docker-compose.yml -o k8s
+    kompose.cmd: kompose convert -f docker-compose.yml
     kompose.version: 1.30.0 (9d8dcb518)
   creationTimestamp: null
   labels:
-    io.kompose.service: tcpserver
-  name: tcpserver
+    io.kompose.service: iotbridgeserver
+  name: iotbridgeserver
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: tcpserver
+      io.kompose.service: iotbridgeserver
   strategy: {}
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose.yml -o k8s
+        kompose.cmd: kompose convert -f docker-compose.yml
         kompose.version: 1.30.0 (9d8dcb518)
       creationTimestamp: null
       labels:
         io.kompose.network/backend-backend: "true"
-        io.kompose.service: tcpserver
+        io.kompose.service: iotbridgeserver
     spec:
       containers:
         - env:
             - name: PLANTAPI_URL
               value: http://plantapi:5000
           image: tinajassik/tcp-server-1:latest
-          name: tcpserver
+          name: iotbridgeserver
           ports:
-            - containerPort: 23
-              hostPort: 23
+            - containerPort: 3014
+              hostPort: 3014
+              protocol: TCP
+            - containerPort: 5024
+              hostPort: 5024
               protocol: TCP
           resources: {}
       restartPolicy: Always
