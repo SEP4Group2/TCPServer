@@ -45,8 +45,8 @@ jobs:
         with:
           namespace: 'default'
           manifests: |
-            k8s/tcpserver-deployment.yaml
-            k8s/tcpserver-service.yaml
+            k8s/iotbridgeserver-deployment.yaml
+            k8s/iotbridgeserver-service.yaml
           images: 'tinajassik/tcp-server-1:latest'
           pull-images: true
           strategy: basic

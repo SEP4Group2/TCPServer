@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: iotbridgeserver
+  name: iotbridgeserver
+  namespace: default
+spec:
+  ports:
+    - name: "3014"
+      port: 3014
+      targetPort: 3014
+    - name: "5024"
+      port: 5024
+      targetPort: 5024
+  type: LoadBalancer
+  selector:
+    io.kompose.service: iotbridgeserver
+status:
+  loadBalancer: {}
