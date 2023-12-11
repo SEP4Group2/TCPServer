@@ -17,7 +17,7 @@ spec:
     - name: "5024"
       port: 5024
       targetPort: 5024
-  type: LoadBalancer
+  type: NodePort
   selector:
     io.kompose.service: iotbridgeserver
 status:
