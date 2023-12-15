@@ -1,4 +1,3 @@
-using System;
 using IoTBridge.Core.Connection.Entities;
 
 namespace IoTBridge.Core.Connection

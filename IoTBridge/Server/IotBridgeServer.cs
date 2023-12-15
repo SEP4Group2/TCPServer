@@ -7,19 +7,22 @@ using IoTBridge.DataProcessors.Iot;
 using IoTBridge.DataProcessors.Iot.Base;
 using IoTBridge.DataProcessors.PlantApi;
 using IoTBridge.DataProcessors.PlantApi.Base;
+using IoTBridge.Listeners;
 using IoTBridge.Listeners.Base;
-using HttpListener = IoTBridge.Listeners.HttpListener;
-using TcpListener = IoTBridge.Listeners.TcpListener;
+using IoTBridge.Listeners.Iot;
+using IoTBridge.Listeners.PlantApi;
+using IoTBridge.Shared.IncomingData.Iot.Base;
+using IoTBridge.Shared.IncomingData.PlantApi.Base;
 
 namespace IoTBridge.Server
 {
     public class IotBridgeServer : IServer
     {
         private readonly ITcpConnectionService tcpConnectionService;
-        private readonly ITcpListener iotListener;
-        private readonly IHttpListener plantApiListener;
-        private readonly AHttpListenerDataProcessor<IHttpReceivedData> plantApiDataProcessor;
-        private readonly ATcpListenerDataProcessor<ITcpReceivedData> iotDataProcessor;
+        private readonly ITcpListener<IIotReceivedData> iotListener;
+        private readonly IHttpListener<IPlantApiReceivedData> plantApiListener;
+        private readonly ATcpListenerDataProcessor<IIotReceivedData> iotDataProcessor;
+        private readonly AHttpListenerDataProcessor<IPlantApiReceivedData> plantApiDataProcessor;
         private readonly IIotDataProcessorService iotDataProcessorService;
     
         private Thread iotListenerThread;
@@ -30,8 +33,8 @@ namespace IoTBridge.Server
             this.tcpConnectionService = tcpConnectionService;
             this.iotDataProcessorService = iotDataProcessorService;
         
-            iotListener = new TcpListener(IPAddress.Any, 3014, 4096);
-            plantApiListener = new HttpListener("http://+:5024/", "/api/plants");
+            iotListener = new IotListener(IPAddress.Any, 3014, 4096);
+            plantApiListener = new PlantApiListener("http://+:5024/", "/api/plants");
             plantApiDataProcessor = new PlantApiDataProcessor(plantApiDataProcessorService);
             iotDataProcessor = new IotDataProcessor(iotDataProcessorService);
         }
@@ -65,12 +68,12 @@ namespace IoTBridge.Server
             iotDataProcessorService.UpdateDeviceStatus(connectionId, false);
         }
 
-        private void HandleIotData(TcpClient tcpClient, ITcpReceivedData data)
+        private void HandleIotData(TcpClient tcpClient, IIotReceivedData data)
         {
             iotDataProcessor.HandleData(tcpClient, data);
         }
     
-        private void HandlePlantApiData(IHttpReceivedData data)
+        private void HandlePlantApiData(IPlantApiReceivedData data)
         {
             plantApiDataProcessor.HandleData(data);
         }

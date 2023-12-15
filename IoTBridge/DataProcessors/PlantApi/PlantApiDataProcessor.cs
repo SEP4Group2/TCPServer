@@ -3,11 +3,11 @@ using IoTBridge.DataProcessors.Base;
 using IoTBridge.DataProcessors.PlantApi.Base;
 using IoTBridge.DataProcessors.PlantApi.Data;
 using IoTBridge.DataProcessors.PlantApi.Data.DeserializationResults;
-using IoTBridge.IncomingData.PlantApi;
+using IoTBridge.Shared.IncomingData.PlantApi.Base;
 
 namespace IoTBridge.DataProcessors.PlantApi
 {
-    public class PlantApiDataProcessor : AHttpListenerDataProcessor<IHttpReceivedData>
+    public class PlantApiDataProcessor : AHttpListenerDataProcessor<IPlantApiReceivedData>
     {
         private readonly IPlantApiDataProcessorService plantApiDataProcessorService;
         public PlantApiDataProcessor(IPlantApiDataProcessorService plantApiDataProcessorService)
@@ -15,11 +15,11 @@ namespace IoTBridge.DataProcessors.PlantApi
             this.plantApiDataProcessorService = plantApiDataProcessorService;
         }
             
-        protected override void ProcessData(IHttpReceivedData data)
+        protected override void ProcessData(IPlantApiReceivedData data)
         {
             switch (data.DataType)
             {
-                case HttpDataTypes.WaterPlant:
+                case PlantApiDataTypes.WaterPlant:
                     PlantApiWaterPlantDataResult waterPlantDataResult = JsonCasterHelper.DeserializeData<PlantApiWaterPlantDataResult, WaterPlantData>(data.Data);
                     if (waterPlantDataResult.HasError)
                     {

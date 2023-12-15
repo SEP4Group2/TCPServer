@@ -1,5 +1,6 @@
 using System.Net.Sockets;
 using IoTBridge.Connection.Base;
+using IoTBridge.Connection.Base.Data;
 
 namespace IoTBridge.Connection
 {
@@ -57,11 +58,6 @@ namespace IoTBridge.Connection
             this.existingIds = existingIds;
         }
 
-        public TcpClient GetTcpClient(int connectionId)
-        {
-            return connections[connectionId].Client;
-        }
-
         public int GetConnectionIdByTcpClient(TcpClient client)
         {
             ITcpConnection? connection = connections.Values.FirstOrDefault(x => x.Client == client);
@@ -70,11 +66,6 @@ namespace IoTBridge.Connection
                 return -1;
             }
             return connection.ConnectionId;
-        }
-
-        public bool ConnectionExists(int deviceId)
-        {
-            return connections.ContainsKey(deviceId);
         }
     }
 }

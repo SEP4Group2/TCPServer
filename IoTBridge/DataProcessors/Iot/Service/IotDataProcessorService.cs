@@ -1,23 +1,27 @@
 using System.Net.Sockets;
-using IoTBridge.Communicators.Base;
 using IoTBridge.Communicators.Iot;
+using IoTBridge.Communicators.Iot.Base;
 using IoTBridge.Communicators.Iot.Data;
 using IoTBridge.Communicators.PlantApi;
-using IoTBridge.Communicators.PlantApi.DTOs.Requests;
-using IoTBridge.Communicators.PlantApi.Helper;
+using IoTBridge.Communicators.PlantApi.Base;
+using IoTBridge.Communicators.PlantApi.Requests;
 using IoTBridge.Connection.Base;
+using IoTBridge.Connection.Base.Data;
 using IoTBridge.Connection.Entities;
 using IoTBridge.DataCaching;
+using IoTBridge.DataCaching.Base;
 using IoTBridge.DataProcessors.Iot.Base;
-using IoTBridge.IncomingData.Iot;
+using IoTBridge.DataProcessors.Iot.Data;
+using IoTBridge.DataProcessors.Iot.Data.Extensions;
+using IoTBridge.Shared.OutgoingData;
 
 namespace IoTBridge.DataProcessors.Iot.Service
 {
     public class IotDataProcessorService : IIotDataProcessorService
     {
         private const int MAX_CACHED_DATA = 1;
-        private readonly IIotCommunicator iotCommunicator;
         private readonly ITcpConnectionService tcpConnectionService;
+        private readonly IIotCommunicator iotCommunicator;
         private readonly IPlantApiCommunicator plantApiCommunicator;
         private readonly IPlantDataApiCache plantDataApiCache;
     
@@ -31,17 +35,17 @@ namespace IoTBridge.DataProcessors.Iot.Service
 
         public void ForwardPlantDataToCache(int connectionId, PlantData plantData)
         {
-            var convertedPlantData = PlantApiCommunicatorHelper.ConvertPlantDataToDataApi(plantData);
+            PlantDataApiDTO convertedPlantData = plantData.ConvertPlantDataToDataApi();
             plantDataApiCache.CachePlantData(connectionId, convertedPlantData);
             if (!plantDataApiCache.HasConnectionReachedMaxCache(connectionId, MAX_CACHED_DATA))
             {
                 return;
             }
 
-            List<PlantDataCreationDTO> cachedPlantData = plantDataApiCache.GetCachedDataByConnectionId(connectionId);
+            List<PlantDataApiDTO> cachedPlantData = plantDataApiCache.GetCachedDataByConnectionId(connectionId);
             Task.Run(async () =>
             {
-                await ForwardPlantDataToApi(connectionId, cachedPlantData);
+                await ForwardPlantDataToApiAsync(connectionId, cachedPlantData);
             });
         }
 
@@ -52,13 +56,13 @@ namespace IoTBridge.DataProcessors.Iot.Service
         
         public async Task UpdateDeviceStatusAsync(int connectionId, bool status)
         {
-            UpdateDeviceStatus deviceStatus = new UpdateDeviceStatus()
+            UpdateDeviceStatusRequest deviceStatusRequest = new UpdateDeviceStatusRequest()
             {
                 DeviceId = connectionId,
                 Status = status
             };
             
-            EmptyCommunicatorResult updateDeviceStatusResult = await plantApiCommunicator.UpdateDeviceStatus(deviceStatus);
+            EmptyCommunicatorResult updateDeviceStatusResult = await plantApiCommunicator.UpdateDeviceStatus(deviceStatusRequest);
             if (updateDeviceStatusResult.HasError)
             {
                 Console.WriteLine(updateDeviceStatusResult.Error);
@@ -103,7 +107,7 @@ namespace IoTBridge.DataProcessors.Iot.Service
             }
             else if(deviceId > 0 && !existingConnectionIds.Contains(deviceId))
             {
-                var status = new UpdateDeviceStatus()
+                var status = new UpdateDeviceStatusRequest()
                 {
                     DeviceId = deviceId,
                     Status = true
@@ -148,10 +152,10 @@ namespace IoTBridge.DataProcessors.Iot.Service
             Console.WriteLine("Sending a message to start sending data...Done");
         }
 
-        private async Task ForwardPlantDataToApi(int connectionId, List<PlantDataCreationDTO> plantData)
+        private async Task ForwardPlantDataToApiAsync(int connectionId, List<PlantDataApiDTO> plantData)
         {
             Console.WriteLine($"Trying to forward cached plant data to api for connection: {connectionId}");
-            var plantDataRequest = new PlantDataCreationListDTO()
+            var plantDataRequest = new PlantDataCreationRequest()
             {
                 PlantDataApi = plantData
             };

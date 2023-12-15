@@ -1,9 +1,11 @@
+using IoTBridge.Core.Data;
 using IoTBridge.Core.Listener;
-using IoTBridge.DataProcessors.PlantApi.Base;
 
-namespace IoTBridge.Listeners.Base;
-
-public interface IHttpListener : IListener
+namespace IoTBridge.Listeners.Base
 {
-    Action<IHttpReceivedData> OnMessageReceived { get; set; }
+    public interface IHttpListener<TReceivedData>: IListener
+        where TReceivedData : IRecievedData
+    {
+        Action<TReceivedData> OnMessageReceived { get; set; }
+    }
 }

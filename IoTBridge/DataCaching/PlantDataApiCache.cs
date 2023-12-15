@@ -1,47 +1,49 @@
-using IoTBridge.Communicators.PlantApi.DTOs.Requests;
+using IoTBridge.DataCaching.Base;
+using IoTBridge.Shared.OutgoingData;
 
-namespace IoTBridge.DataCaching;
-
-public class PlantDataApiCache : IPlantDataApiCache
+namespace IoTBridge.DataCaching
 {
-    private readonly int memoryProtectionMaxCache;
-    private Dictionary<int, List<PlantDataCreationDTO>> plantDataByConnectionId = new();
-
-    public PlantDataApiCache(int memoryProtectionMaxCache)
+    public class PlantDataApiCache : IPlantDataApiCache
     {
-        this.memoryProtectionMaxCache = memoryProtectionMaxCache;
-    }
+        private readonly int memoryProtectionMaxCache;
+        private Dictionary<int, List<PlantDataApiDTO>> plantDataByConnectionId = new();
 
-    public void CachePlantData(int connectionId, PlantDataCreationDTO dataRequest)
-    {
-        if (!plantDataByConnectionId.ContainsKey(connectionId))
+        public PlantDataApiCache(int memoryProtectionMaxCache)
         {
-            plantDataByConnectionId.Add(connectionId, new List<PlantDataCreationDTO>(){dataRequest});
+            this.memoryProtectionMaxCache = memoryProtectionMaxCache;
         }
-        else
+
+        public void CachePlantData(int connectionId, PlantDataApiDTO dataRequest)
         {
-            if (HasConnectionReachedMaxCache(connectionId, memoryProtectionMaxCache))
+            if (!plantDataByConnectionId.ContainsKey(connectionId))
             {
-                Console.WriteLine($"Maximum cache reached for connection with id: {connectionId}");
-                plantDataByConnectionId[connectionId].Clear();
+                plantDataByConnectionId.Add(connectionId, new List<PlantDataApiDTO>(){dataRequest});
             }
-            plantDataByConnectionId[connectionId].Add(dataRequest);           
-            Console.WriteLine($"Data for connection: {connectionId} successfully cached");
+            else
+            {
+                if (HasConnectionReachedMaxCache(connectionId, memoryProtectionMaxCache))
+                {
+                    Console.WriteLine($"Maximum cache reached for connection with id: {connectionId}");
+                    plantDataByConnectionId[connectionId].Clear();
+                }
+                plantDataByConnectionId[connectionId].Add(dataRequest);           
+                Console.WriteLine($"Data for connection: {connectionId} successfully cached");
+            }
         }
-    }
 
-    public bool HasConnectionReachedMaxCache(int connectionId, int maxCachedData)
-    {
-        return plantDataByConnectionId.ContainsKey(connectionId) && plantDataByConnectionId[connectionId].Count >= maxCachedData;
-    }
+        public bool HasConnectionReachedMaxCache(int connectionId, int maxCachedData)
+        {
+            return plantDataByConnectionId.ContainsKey(connectionId) && plantDataByConnectionId[connectionId].Count >= maxCachedData;
+        }
     
-    public List<PlantDataCreationDTO> GetCachedDataByConnectionId(int connectionId)
-    {
-        return plantDataByConnectionId[connectionId];
-    }
+        public List<PlantDataApiDTO> GetCachedDataByConnectionId(int connectionId)
+        {
+            return plantDataByConnectionId[connectionId];
+        }
     
-    public bool ClearCacheByConnectionId(int connectionId)
-    {
-        return plantDataByConnectionId.Remove(connectionId);
+        public void ClearCacheByConnectionId(int connectionId)
+        {
+            plantDataByConnectionId.Remove(connectionId);
+        }
     }
 }

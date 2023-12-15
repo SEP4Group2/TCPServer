@@ -1,9 +1,13 @@
 ﻿using IoTBridge.Communicators.Iot;
+using IoTBridge.Communicators.Iot.Base;
 using IoTBridge.Communicators.PlantApi;
-using IoTBridge.Communicators.PlantApi.DTOs.Responses.Results;
+using IoTBridge.Communicators.PlantApi.Base;
+using IoTBridge.Communicators.PlantApi.Results;
 using IoTBridge.Connection;
 using IoTBridge.Connection.Base;
+using IoTBridge.Core.Server;
 using IoTBridge.DataCaching;
+using IoTBridge.DataCaching.Base;
 using IoTBridge.DataProcessors.Iot.Base;
 using IoTBridge.DataProcessors.Iot.Service;
 using IoTBridge.DataProcessors.PlantApi.Base;
@@ -20,6 +24,8 @@ namespace IoTBridge
         private static IIotDataProcessorService iotDataProcessorService;
         private static IPlantApiDataProcessorService plantApiDataProcessorService;
         private static IPlantDataApiCache plantDataApiCache;
+        
+        private static IServer iotBridgeServer;
         
         public static async Task Main()
         {
@@ -50,7 +56,7 @@ namespace IoTBridge
         private static void RunServer()
         {
             Console.WriteLine("Starting IoTBridge server...");
-            IotBridgeServer iotBridgeServer = new IotBridgeServer(tcpConnectionService, iotDataProcessorService, plantApiDataProcessorService);
+            iotBridgeServer = new IotBridgeServer(tcpConnectionService, iotDataProcessorService, plantApiDataProcessorService);
             iotBridgeServer.Initialize();
             iotBridgeServer.Run();
             Console.WriteLine("IoTBridge server has been started");

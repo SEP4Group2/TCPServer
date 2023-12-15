@@ -1,7 +1,8 @@
 using IoTBridge.Communicators.Base;
-using IoTBridge.Communicators.PlantApi.DTOs.Requests;
-using IoTBridge.Communicators.PlantApi.DTOs.Responses;
-using IoTBridge.Communicators.PlantApi.DTOs.Responses.Results;
+using IoTBridge.Communicators.PlantApi.Base;
+using IoTBridge.Communicators.PlantApi.Requests;
+using IoTBridge.Communicators.PlantApi.Results;
+using IoTBridge.Communicators.PlantApi.Results.Data;
 using IoTBridge.Core.JsonCaster;
 
 //TODO: Change the endpoints to the correct ones
@@ -29,9 +30,9 @@ namespace IoTBridge.Communicators.PlantApi
             }
         }
 
-        public async Task<EmptyCommunicatorResult> UpdateDeviceStatus(UpdateDeviceStatus updateDeviceStatus)
+        public async Task<EmptyCommunicatorResult> UpdateDeviceStatus(UpdateDeviceStatusRequest updateDeviceStatusRequest)
         {
-            SerializationResult body = JsonCasterHelper.SerializeData(updateDeviceStatus);
+            SerializationResult body = JsonCasterHelper.SerializeData(updateDeviceStatusRequest);
             if (body.HasError)
             {
                 return new EmptyCommunicatorResult()
@@ -80,9 +81,9 @@ namespace IoTBridge.Communicators.PlantApi
             }
         }
 
-        public async Task<EmptyCommunicatorResult> SendPlantData(PlantDataCreationListDTO plantDataCreationListDto)
+        public async Task<EmptyCommunicatorResult> SendPlantData(PlantDataCreationRequest plantDataCreationRequest)
         {
-            SerializationResult body = JsonCasterHelper.SerializeData(plantDataCreationListDto);
+            SerializationResult body = JsonCasterHelper.SerializeData(plantDataCreationRequest);
             if (body.HasError)
             {
                 return new EmptyCommunicatorResult()

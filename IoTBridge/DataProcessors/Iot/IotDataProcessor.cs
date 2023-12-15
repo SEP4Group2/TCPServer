@@ -4,11 +4,11 @@ using IoTBridge.DataProcessors.Base;
 using IoTBridge.DataProcessors.Iot.Base;
 using IoTBridge.DataProcessors.Iot.Data;
 using IoTBridge.DataProcessors.Iot.Data.DeserializationResults;
-using IoTBridge.IncomingData.Iot;
+using IoTBridge.Shared.IncomingData.Iot.Base;
 
 namespace IoTBridge.DataProcessors.Iot
 {
-    public class IotDataProcessor : ATcpListenerDataProcessor<ITcpReceivedData>
+    public class IotDataProcessor : ATcpListenerDataProcessor<IIotReceivedData>
     {
         private readonly IIotDataProcessorService iotDataProcesorService;
         
@@ -17,7 +17,7 @@ namespace IoTBridge.DataProcessors.Iot
             this.iotDataProcesorService = iotDataProcesorService;
         }
 
-        public override void HandleData(TcpClient tcpClient, ITcpReceivedData data)
+        public override void HandleData(TcpClient tcpClient, IIotReceivedData data)
         {
             Console.WriteLine($"Received data from TcpClient: {tcpClient.Client.RemoteEndPoint}");
             if (DoesDataHandlingRequireTcpClient(data.DataType))
@@ -29,9 +29,9 @@ namespace IoTBridge.DataProcessors.Iot
             base.HandleData(tcpClient, data);
         }
 
-        private void HandleTcpClientData(TcpClient tcpClient, ITcpReceivedData data)
+        private void HandleTcpClientData(TcpClient tcpClient, IIotReceivedData data)
         {
-            if (data.DataType == TcpDataTypes.Registration)
+            if (data.DataType == IotDataTypes.Registration)
             {
                 IotRegistrationDataResult registrationDataResult =
                     JsonCasterHelper.DeserializeData<IotRegistrationDataResult, RegistrationData>(data.Data);
@@ -44,21 +44,21 @@ namespace IoTBridge.DataProcessors.Iot
             }
         }
 
-        private bool DoesDataHandlingRequireTcpClient(TcpDataTypes dataDataType)
+        private bool DoesDataHandlingRequireTcpClient(IotDataTypes dataDataType)
         {
             bool doesDataHandlingRequireTcpClient = dataDataType switch
             {
-                TcpDataTypes.Registration => true,
+                IotDataTypes.Registration => true,
                 _ => false
             };
             return doesDataHandlingRequireTcpClient;
         }
 
-        protected override void ProcessData(ITcpReceivedData data)
+        protected override void ProcessData(IIotReceivedData data)
         {
             switch (data.DataType)
             {
-                case TcpDataTypes.PlantData:
+                case IotDataTypes.PlantData:
                     IotPlantDataResult plantDataResult = JsonCasterHelper.DeserializeData<IotPlantDataResult, PlantData>(data.Data);
                     if (plantDataResult.HasError)
                     {
