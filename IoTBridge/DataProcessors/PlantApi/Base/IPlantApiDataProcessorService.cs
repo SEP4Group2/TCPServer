@@ -1,4 +1,4 @@
-using IoTBridge.IncomingData.PlantApi;
+using IoTBridge.DataProcessors.PlantApi.Data;
 
 namespace IoTBridge.DataProcessors.PlantApi.Base
 {

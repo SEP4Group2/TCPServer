@@ -6,8 +6,8 @@ namespace IoTBridge.Communicators.Base
     {
         private readonly HttpClient httpClient;
         private readonly string baseUrl;
-    
-        public AHttpCommunicator(string baseUrl)
+
+        protected AHttpCommunicator(string baseUrl)
         {
             this.baseUrl = baseUrl;
             httpClient = new HttpClient();

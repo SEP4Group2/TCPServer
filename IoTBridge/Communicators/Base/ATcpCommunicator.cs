@@ -1,32 +1,34 @@
 using System.Text;
 using IoTBridge.Connection.Base;
 
-namespace IoTBridge.Communicators.Base;
-
-public abstract class ATcpCommunicator
+namespace IoTBridge.Communicators.Base
 {
-    private readonly ITcpConnectionService tcpConnectionService;
-    public ATcpCommunicator(ITcpConnectionService tcpConnectionService)
+    public abstract class ATcpCommunicator
     {
-        this.tcpConnectionService = tcpConnectionService;
-    }
-    protected void Send(int deviceId, string message)
-    {
-        message += "\n";
-        byte[] data = ConvertStringToByteArray(message);
-        try
+        private readonly ITcpConnectionService tcpConnectionService;
+
+        protected ATcpCommunicator(ITcpConnectionService tcpConnectionService)
         {
-            tcpConnectionService.SendData(deviceId, data);
+            this.tcpConnectionService = tcpConnectionService;
         }
-        catch (Exception e)
+        protected void Send(int deviceId, string message)
         {
-            Console.WriteLine($"An error occured when sending data to device: {deviceId}");
-            Console.WriteLine($"Error: {e}");
+            message += "\n";
+            byte[] data = ConvertStringToByteArray(message);
+            try
+            {
+                tcpConnectionService.SendData(deviceId, data);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"An error occured when sending data to device: {deviceId}");
+                Console.WriteLine($"Error: {e}");
+            }
         }
-    }
     
-    private byte[] ConvertStringToByteArray(string input)
-    {
-        return Encoding.ASCII.GetBytes(input);
+        private byte[] ConvertStringToByteArray(string input)
+        {
+            return Encoding.ASCII.GetBytes(input);
+        }
     }
 }
